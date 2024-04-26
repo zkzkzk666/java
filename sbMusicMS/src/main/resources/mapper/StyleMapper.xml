@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zk.mapper.StyleMapper">
+
+    <resultMap type="com.zk.domain.Style" id="StyleMap">
+        <result property="styleid" column="styleId" jdbcType="VARCHAR"/>
+        <result property="stylename" column="styleName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StyleMap">
+        select styleId,
+               styleName
+        from style
+        where styleId = #{styleid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="StyleMap">
+        select
+        styleId, styleName
+        from style
+        <where>
+            <if test="styleid != null and styleid != ''">
+                and styleId = #{styleid}
+            </if>
+            <if test="stylename != null and stylename != ''">
+                and styleName = #{stylename}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from style
+        <where>
+            <if test="styleid != null and styleid != ''">
+                and styleId = #{styleid}
+            </if>
+            <if test="stylename != null and stylename != ''">
+                and styleName = #{stylename}
+            </if>
+        </where>
+    </select>
+<!--    通过字段名查询数据-->
+    <select id="queryByName" resultMap="StyleMap">
+        select styleId,
+               styleName
+        from style
+        where styleName like CONCAT('%',#{stylename},'%')
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="styleid" useGeneratedKeys="true">
+        insert into style(styleid,styleName)
+        values (#{styleid},#{stylename})
+    </insert>
+    <!--通过主键修改数据-->
+    <update id="update">
+        update style
+        <set>
+            <if test="stylename != null and stylename != ''">
+                styleName = #{stylename},
+            </if>
+        </set>
+        where styleId = #{styleid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from style
+        where styleId = #{styleid}
+    </delete>
+
+</mapper>
+

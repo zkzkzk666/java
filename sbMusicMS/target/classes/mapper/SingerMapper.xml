@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zk.mapper.SingerMapper">
+
+    <resultMap type="com.zk.domain.Singer" id="SingerMap">
+        <id property="singerid" column="singerId"/>
+        <result property="gender" column="gender"/>
+        <result property="singername" column="singerName"/>
+        <result property="repsong" column="repSong"/>
+        <result property="repalbum" column="repAlbum"/>
+        <result property="birthday" column="birthday"/>
+        <association property="style" javaType="com.zk.domain.Style">
+            <id property="styleid" column="styleId"/>
+            <result property="stylename" column="styleName"/>
+        </association>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="SingerMap">
+        select singer.singerId,
+               singer.gender,
+               singer.singerName,
+               singer.repSong,
+               singer.repAlbum,
+               singer.birthday,
+               style.styleName
+        from singer,
+             style
+        where style.styleId = singer.styleId
+            and singerId = #{singerid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="SingerMap">
+        select singer.singerId,
+               singer.gender,
+               singer.singerName,
+               singer.repSong,
+               singer.repAlbum,
+               singer.birthday,
+               style.styleName
+        from singer,
+             style
+        where style.styleId = singer.styleId
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from singer
+        <where>
+            <if test="singerid != null and singerid != ''">
+                and singerId = #{singerid}
+            </if>
+            <if test="gender != null and gender != ''">
+                and gender = #{gender}
+            </if>
+            <if test="singername != null and singername != ''">
+                and singerName = #{singername}
+            </if>
+            <if test="repsong != null and repsong != ''">
+                and repSong = #{repsong}
+            </if>
+            <if test="repalbum != null and repalbum != ''">
+                and repAlbum = #{repalbum}
+            </if>
+            <if test="birthday != null and birthday != ''">
+                and birthday = #{birthday}
+            </if>
+            <if test="styleid != null and styleid != ''">
+                and styleId = #{styleid}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="singerid" useGeneratedKeys="true">
+        insert into singer(singerid,gender, singerName, repSong, repAlbum, birthday, styleId)
+        values (
+                #{singerid},
+                #{gender},
+                #{singername},
+                #{repsong},
+                #{repalbum},
+                #{birthday},
+                (select styleId from style where style.styleName =#{stylename})
+                )
+    </insert>
+    <!--通过主键修改数据-->
+    <update id="update">
+        update singer
+        <set>
+            <if test="gender != null and gender != ''">
+                gender = #{gender},
+            </if>
+            <if test="singername != null and singername != ''">
+                singerName = #{singername},
+            </if>
+            <if test="repsong != null and repsong != ''">
+                repSong = #{repsong},
+            </if>
+            <if test="repalbum != null and repalbum != ''">
+                repAlbum = #{repalbum},
+            </if>
+            <if test="birthday != null and birthday != ''">
+                birthday = #{birthday},
+            </if>
+            <if test="styleid != null and styleid != ''">
+                styleId = #{styleid},
+            </if>
+        </set>
+        where singerId = #{singerid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from singer
+        where singerId = #{singerid}
+    </delete>
+
+</mapper>
+

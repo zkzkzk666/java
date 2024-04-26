@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zk.mapper.AlbumMapper">
+    <resultMap type="com.zk.domain.Album" id="AlbumMap">
+        <id property="albumid" column="albumId"/>
+        <result property="albumname" column="albumName"/>
+        <association property="singer" javaType="com.zk.domain.Singer">
+            <id property="singerid" column="singerId"/>
+            <result property="singername" column="singerName"/>
+        </association>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="AlbumMap">
+        select album.albumId,
+               album.albumName,
+               singer.singerName
+        from album,
+             singer
+        where album.singerId = singer.singerId
+                and albumId = #{albumid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="AlbumMap">
+        select album.albumId,
+               album.albumName,
+               singer.singerName
+        from album,
+             singer
+        where album.singerId = singer.singerId
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from album
+        <where>
+            <if test="albumid != null and albumid != ''">
+                and albumId = #{albumid}
+            </if>
+            <if test="albumname != null and albumname != ''">
+                and albumName = #{albumname}
+            </if>
+            <if test="singerid != null and singerid != ''">
+                and singerId = #{singerid}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="albumid" useGeneratedKeys="true">
+        insert into album(albumid,albumName, singerId)
+        values (#{albumid},#{albumname}, #{singerid})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update album
+        <set>
+            <if test="albumname != null and albumname != ''">
+                albumName = #{albumname},
+            </if>
+            <if test="singerid != null and singerid != ''">
+                singerId = #{singerid},
+            </if>
+        </set>
+        where albumId = #{albumid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from album
+        where albumId = #{albumid}
+    </delete>
+
+</mapper>
+

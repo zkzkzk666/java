@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zk.mapper.SongMapper">
+
+    <resultMap type="com.zk.domain.Song" id="SongMap">
+        <id property="songid" column="songId"/>
+        <result property="songname" column="songName"/>
+        <association property="singer" javaType="com.zk.domain.Singer">
+            <id property="singerid" column="singerId"/>
+            <result property="singername" column="singerName"/>
+        </association>
+        <association property="style" javaType="com.zk.domain.Style">
+            <id property="styleid" column="styleId"/>
+            <result property="stylename" column="styleName"/>
+        </association>
+        <association property="album" javaType="com.zk.domain.Album">
+            <id property="albumid" column="albumId"/>
+            <result property="albumname" column="albumName"/>
+        </association>
+    </resultMap>
+    <!--查询单个-->
+    <select id="queryById" resultMap="SongMap">
+        select song.songId,song.songName, singer.singerName, style.styleName, album.albumName
+        from song,
+             singer,
+             style,
+             album
+        where song.singerId = singer.singerId
+          and style.styleId = song.styleId
+          and album.albumId = song.albumId
+          and songId = #{songid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="SongMap">
+        select song.songId,song.songName, singer.singerName, style.styleName, album.albumName
+        from song,
+             singer,
+             style,
+             album
+        where song.singerId = singer.singerId
+          and song.styleId=style.styleId
+          and song.albumId=album.albumId
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from song
+        <where>
+            <if test="songid != null and songid != ''">
+                and songId = #{songid}
+            </if>
+            <if test="songname != null and songname != ''">
+                and songName = #{songname}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="songid" useGeneratedKeys="true">
+        insert into song(songId,songName, singerId, styleId, albumId)
+        values (
+                #{songid},
+                #{songname},
+                (select singerId from singer where singer.singerName =#{singername}),
+                (select styleId from style where style.styleName =#{stylename}),
+                (select albumId from album where album.albumName =#{albumname})
+                )
+    </insert>
+    <!--编辑数据-->
+    <update id="update">
+        update song
+        set
+                songId = #{songid},
+                songName = #{songname},
+                singerId=(select singerId from singer where singer.singerName =#{singername}),
+                styleId=(select styleId from style where style.styleName =#{stylename}),
+                albumId=(select albumId from album where album.albumName =#{albumname})
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from song
+        where songId = #{songid}
+    </delete>
+
+</mapper>
+
